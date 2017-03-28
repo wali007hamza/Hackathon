@@ -21,14 +21,13 @@ namespace MdsDataAccessClientLibSample
             var startTime = DateTime.UtcNow.AddDays(-2);
             while (startTime < DateTime.UtcNow)
             {
-                var endTime = startTime.AddSeconds(IntervalInSeconds);
                 while (retryNum < MaxRetry)
                 {
                     try
                     {
                         counter = 0;
                         var result = mdsDataAccessClient.QueryMdsTableAsync(MdsUlsTraceEventTableNameRegex, 0, startTime,
-                            endTime, QueryString);
+                            startTime.AddMinutes(1), QueryString);
 
                         foreach (var item in result)
                         {
@@ -42,6 +41,7 @@ namespace MdsDataAccessClientLibSample
                     catch (Exception e)
                     {
                         Console.Write(e.ToString());
+                        Console.ReadKey();
                         Console.WriteLine("counter = " + counter);
                         System.Threading.Thread.Sleep(5000);
                         retryNum++;
@@ -53,7 +53,7 @@ namespace MdsDataAccessClientLibSample
 
                 var retrievedData = _dataAccess.GetData(startTime);
 
-                startTime = endTime;
+                startTime = startTime.AddMinutes(1);
                 _durationQuantiles = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
                 _cachedDurationQuantilesPerMinute = new Dictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>>();
             }
@@ -92,6 +92,8 @@ namespace MdsDataAccessClientLibSample
         public static void Main(string[] args)
         {
             Console.WriteLine("1. Fetching data from MDS");
+            var items = _dataAccess.GetDataForTimeRange(DateTime.UtcNow.AddDays(-2),
+                DateTime.UtcNow.AddDays(-2).AddHours(1));
             FetechDataUsingAsyncApi();
 
             //Console.WriteLine("2. Fetching MDS tables that matches the reg expression using MdsDataAccessClient.GetTables");
@@ -108,8 +110,6 @@ namespace MdsDataAccessClientLibSample
         private const string QueryString = "where uls_EventId == \"ardak\" and (Message.Contains(\"API\") or Message.Contains(\"Storage\") or Message.Contains(\"Service\")) and not Message.Contains(\"PingTest\")";
 
         private const int MaxRetry = 6;
-
-        private const int IntervalInSeconds = 60;
 
         private static readonly DataAccess _dataAccess = new DataAccess();
     }

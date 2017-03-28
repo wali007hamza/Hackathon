@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 
 namespace MdsDataAccessClientSample
 {
@@ -8,10 +8,22 @@ namespace MdsDataAccessClientSample
     {
         public static DataType ExtractDataType(string message)
         {
+            var dataType = new DataType
+            {
+                Duration = 0,
+                Name = string.Empty,
+                Type = string.Empty,
+                SubType = string.Empty
+            };
             try
             {
                 var jObject = JObject.Parse(message);
                 var item = jObject["DC"];
+
+                if (item == null)
+                {
+                    return dataType;
+                }
 
                 var jsonString = item.Value<string>().Replace("\\", "");
                 var newJObject = JObject.Parse(jsonString);
@@ -24,15 +36,12 @@ namespace MdsDataAccessClientSample
                     SubType = newJObject["SubType"].ToString()
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new DataType
-                {
-                    Duration = 0,
-                    Name = string.Empty,
-                    Type = string.Empty,
-                    SubType = string.Empty
-                };
+                Console.WriteLine(message + "\n" + ex);
+                Console.ReadKey();
+
+                return dataType;
             }
         }
 
@@ -54,7 +63,7 @@ namespace MdsDataAccessClientSample
                 var quantileIndices = new List<int>();
                 foreach (var quantile in _quantiles)
                 {
-                    var index = (int) (quantile*count);
+                    var index = (int)(quantile * count);
                     quantileIndices.Add(index);
                 }
 
