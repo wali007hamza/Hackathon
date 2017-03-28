@@ -1,0 +1,9 @@
+C:\MyRepo\Hackathon\MdsDataAccess\bin\Debug\MdsDataAccess.dll
+C:\MyRepo\Hackathon\MdsDataAccess\bin\Debug\MdsDataAccess.pdb
+C:\MyRepo\Hackathon\MdsDataAccess\bin\Debug\Newtonsoft.Json.dll
+C:\MyRepo\Hackathon\MdsDataAccess\bin\Debug\StackExchange.Redis.dll
+C:\MyRepo\Hackathon\MdsDataAccess\bin\Debug\Newtonsoft.Json.xml
+C:\MyRepo\Hackathon\MdsDataAccess\bin\Debug\StackExchange.Redis.xml
+C:\MyRepo\Hackathon\MdsDataAccess\obj\Debug\MdsDataAccess.csprojResolveAssemblyReference.cache
+C:\MyRepo\Hackathon\MdsDataAccess\obj\Debug\MdsDataAccess.dll
+C:\MyRepo\Hackathon\MdsDataAccess\obj\Debug\MdsDataAccess.pdb

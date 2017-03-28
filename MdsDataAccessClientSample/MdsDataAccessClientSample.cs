@@ -1,4 +1,6 @@
-﻿using MdsDataAccessClientSample;
+﻿using MdsDataAccess;
+using MdsDataAccessClientSample;
+using Microsoft.Cis.Monitoring.Mds.mdscommon;
 
 namespace MdsDataAccessClientLibSample
 {
@@ -47,8 +49,13 @@ namespace MdsDataAccessClientLibSample
                 }
 
                 MdsHelper.AppendCachedDurationQuantilesPerMinute(_cachedDurationQuantilesPerMinute, _durationQuantiles, startTime);
+                _dataAccess.SaveData(_cachedDurationQuantilesPerMinute);
+
+                var retrievedData = _dataAccess.GetData(startTime);
+
                 startTime = endTime;
                 _durationQuantiles = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+                _cachedDurationQuantilesPerMinute = new Dictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>>();
             }
 
             Console.ReadKey();
@@ -56,7 +63,7 @@ namespace MdsDataAccessClientLibSample
 
         private static IDictionary<string, List<int>> _durationQuantiles = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
 
-        private static readonly IDictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>> _cachedDurationQuantilesPerMinute =
+        private static IDictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>> _cachedDurationQuantilesPerMinute =
             new Dictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>>();
 
         #endregion
@@ -103,5 +110,7 @@ namespace MdsDataAccessClientLibSample
         private const int MaxRetry = 6;
 
         private const int IntervalInSeconds = 60;
+
+        private static readonly DataAccess _dataAccess = new DataAccess();
     }
 }
