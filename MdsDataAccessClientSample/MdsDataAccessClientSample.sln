@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MdsDataAccessClientSample", "MdsDataAccessClientSample.csproj", "{FAB1159B-8893-4810-9346-AEBB7911AF00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1F1711EF-A4A9-46CB-9712-C1C7DE6E3518}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAB1159B-8893-4810-9346-AEBB7911AF00}.Debug|x86.ActiveCfg = Debug|x64
+		{FAB1159B-8893-4810-9346-AEBB7911AF00}.Debug|x86.Build.0 = Debug|x64
+		{FAB1159B-8893-4810-9346-AEBB7911AF00}.Release|x86.ActiveCfg = Release|x86
+		{FAB1159B-8893-4810-9346-AEBB7911AF00}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

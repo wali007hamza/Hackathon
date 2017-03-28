@@ -1,0 +1,21 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <MdsDataAccessDLLs Include="$(MSBuildThisFileDirectory)..\lib\net40\**\*">
+      <Destination>$(OutDir)%(RecursiveDir)</Destination>
+    </MdsDataAccessDLLs>
+  </ItemGroup>
+  <Target Name="CheckBuildConfigurationAndCopyDlls">
+    <!-- Make sure the platform has been set appropriately -->
+    <Error Code="MDS0001" Text="Please change your target platform to x64 via Build -> Configuration Manager" Condition=" '$(Platform)' != 'x64' " File="$(MSBuildProjectFile)"/>
+    
+    <Copy SourceFiles="@(MdsDataAccessDLLs)" DestinationFiles="@(MdsDataAccessDLLs->'%(Destination)%(Filename)%(Extension)')" SkipUnchangedFiles="false"/>
+  </Target>
+
+  <PropertyGroup>
+    <AfterBuildDependsOn>
+      CheckBuildConfigurationAndCopyDlls;
+    </AfterBuildDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="AfterBuild" DependsOnTargets="$(AfterBuildDependsOn)"/>
+</Project>
