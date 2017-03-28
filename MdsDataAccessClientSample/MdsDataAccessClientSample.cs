@@ -18,7 +18,7 @@ namespace MdsDataAccessClientLibSample
             var mdsDataAccessClient = new MdsDataAccessClient(MdsEndpoint, MdsCertSubjectName);
             int retryNum = 0, counter = 0;
 
-            var startTime = DateTime.UtcNow.AddDays(-2);
+            var startTime = DateTime.UtcNow.AddHours(-6);
             while (startTime < DateTime.UtcNow)
             {
                 while (retryNum < MaxRetry)
@@ -54,17 +54,19 @@ namespace MdsDataAccessClientLibSample
                 var retrievedData = _dataAccess.GetData(startTime);
 
                 startTime = startTime.AddMinutes(1);
-                _durationQuantiles = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
-                _cachedDurationQuantilesPerMinute = new Dictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>>();
+                _durationQuantiles = new Dictionary<string, IDictionary<string, IDictionary<string, List<int>>>>(StringComparer.OrdinalIgnoreCase);
+                _cachedDurationQuantilesPerMinute =
+                    new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>();
             }
 
             Console.ReadKey();
         }
 
-        private static IDictionary<string, List<int>> _durationQuantiles = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+        private static IDictionary<string, IDictionary<string, IDictionary<string, List<int>>>> _durationQuantiles =
+            new Dictionary<string, IDictionary<string, IDictionary<string, List<int>>>>(StringComparer.OrdinalIgnoreCase);
 
-        private static IDictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>> _cachedDurationQuantilesPerMinute =
-            new Dictionary<DateTime, IDictionary<string, Tuple<int, int, int, int, int, int>>>();
+        private static IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>> _cachedDurationQuantilesPerMinute =
+            new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>();
 
         #endregion
 

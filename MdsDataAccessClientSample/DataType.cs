@@ -3,6 +3,7 @@
     public class DataType
     {
         public string Name { get; set; }
+
         public string Type { get; set; }
 
         public string SubType { get; set; }
