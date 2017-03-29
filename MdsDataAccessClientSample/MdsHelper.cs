@@ -45,11 +45,6 @@ namespace MdsDataAccessClientSample
             }
         }
 
-        public static string GetQuantileKey(DataType dataType)
-        {
-            return dataType.Name + MdsDataTypeDelimiter + dataType.Type + MdsDataTypeDelimiter + dataType.SubType;
-        }
-
         public static void AppendCachedDurationQuantilesPerMinute(
             IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>
                 cachedDurationQuantilesPerMinute, IDictionary<string, IDictionary<string, IDictionary<string, List<int>>>> durationQuantiles, DateTime dateTime)
@@ -121,7 +116,35 @@ namespace MdsDataAccessClientSample
             subTypeValue.Add(dataType.Duration);
         }
 
-        private const string MdsDataTypeDelimiter = "~";
+        public static void AppendListOfDataPoints(
+            IDictionary<string, IDictionary<string, IDictionary<string, List<int>>>> durationQuantiles,
+            IDictionary<string, IDictionary<string, HashSet<string>>> dataPointNames)
+        {
+            foreach (var kvName in durationQuantiles)
+            {
+                IDictionary<string, HashSet<string>> activityName;
+                if (!dataPointNames.TryGetValue(kvName.Key, out activityName))
+                {
+                    activityName = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                    dataPointNames[kvName.Key] = activityName;
+                }
+
+                foreach (var kvType in kvName.Value)
+                {
+                    HashSet<string> activityType;
+                    if (!activityName.TryGetValue(kvType.Key, out activityType))
+                    {
+                        activityType = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        activityName[kvType.Key] = activityType;
+                    }
+
+                    foreach (var kvSubType in kvType.Value)
+                    {
+                        activityType.Add(kvSubType.Key);
+                    }
+                }
+            }
+        }
 
         private static readonly List<double> _quantiles = new List<double> { 0.5, 0.75, 0.9, 0.99, 0.999, 0.9995 };
 
@@ -129,6 +152,6 @@ namespace MdsDataAccessClientSample
 
         private const string EmptyType = "_emptyType_";
 
-        private const string EmptySubType = "_emptySubType";
+        private const string EmptySubType = "_emptySubType_";
     }
 }

@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "Telemetry";
+    ViewBag.ScriptsBundle = "~/bundles/js/telemetry";
+}
+
+@section datascript{
+    <script>
+        // Urls supported by this page
+        var Url = {
+            'GetActivityNames': "@Url.Action("GetActivityNames", "Telemetry")",
+            'GetActivityTypesForName': "@Url.Action("GetActivityTypesForName", "Telemetry")",
+            'GetActivitySubTypesForNameAndType': "@Url.Action("GetActivitySubTypesForNameAndType", "Telemetry")",
+        }
+    </script>
+}
+
+@section templates
+{
+    @{ Html.RenderPartial("_Tmpl_PlotCanvas");}
+}
+
+<div id="TelemetryWrapper" class="container-fluid">
+    <div id="QueryWrapper">
+        <h2 class="headline">Acitivity durations in quantiles:</h2>
+        <form id="QueryForm">
+            <div class="col-xs-6">
+                <div class="col-xs-12 form-group">
+                    <label for="InputActivityName" class="control-label">ActivityName</label>
+                    <input class="form-control" type="text" id="InputActivityName" list="ActivityNameList" />
+                    <datalist id="ActivityNameList">
+                        @foreach (var activityName in ViewBag.DataPointNames)
+                        {
+                            <option value="@activityName.Key" />
+                        }
+                    </datalist>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="InputActivityType" class="control-label">ActivityType</label>
+                    <input class="form-control" type="text" id="InputActivityType" list="ActivityTypeList" />
+                    <datalist id="ActivityTypeList"></datalist>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="InputActivitySubType" class="control-label">ActivitySubType</label>
+                    <input class="form-control" type="text" id="InputActivitySubType" list="ActivitySubTypeList" />
+                    <datalist id="ActivitySubTypeList"></datalist>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group col-xs-6">
+                    <label class="control-label" for="InputCurrentTime">CurrentTime</label>
+                    <input class="form-control" type="text" id="InputCurrentTime" size="10" disabled="" placeholder="@DateTime.UtcNow" />
+                </div>
+                <div class="form-group col-xs-3">
+                    <label class="control-label" for="InputRewindHours">RewindHours</label>
+                    <input class="form-control" type="text" id="InputRewindHours" size="4" placeholder="6" />
+                </div>
+                <div class="form-group col-xs-3 rewindBtn">
+                    <button type="submit" id="RewindBtn" class="btn btn-submit">Rewind</button>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <button type="submit" id="LoadBtn" class="btn btn-lg btn-submit">Load</button>
+            </div>
+        </form>
+    </div>
+    <div id="LoadingScreen">
+        <div id="RequestSpinner"></div>
+        <h2>Loading...</h2>
+    </div>
+    <div id="ErrorPlaceholder"></div>
+    <div id="ResultsContainer" class="hidden">
+        <h3 id="QualityOfServiceHeading">Quality of Service</h3>
+        <div id="QualityOfServicePlaceholder"></div>
+        <h3 id="TrafficHeading">Traffic</h3>
+        <div id="TrafficPlaceholder"></div>
+        <h3 id="DurationHeading">Durations [ms]</h3>
+        <div id="DurationPlaceholder"></div>
+    </div>
+</div>
+@Scripts.Render(ViewBag.ScriptsBundle)

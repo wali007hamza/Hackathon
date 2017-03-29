@@ -1,4 +1,5 @@
-﻿using MdsDataAccess;
+﻿using System.Collections.Concurrent;
+using MdsDataAccess;
 using MdsDataAccessClientSample;
 using Microsoft.Cis.Monitoring.Mds.mdscommon;
 
@@ -18,7 +19,7 @@ namespace MdsDataAccessClientLibSample
             var mdsDataAccessClient = new MdsDataAccessClient(MdsEndpoint, MdsCertSubjectName);
             int retryNum = 0, counter = 0;
 
-            var startTime = DateTime.UtcNow.AddHours(-6);
+            var startTime = DateTime.UtcNow.AddHours(-2);
             while (startTime < DateTime.UtcNow)
             {
                 while (retryNum < MaxRetry)
@@ -49,6 +50,7 @@ namespace MdsDataAccessClientLibSample
                 }
 
                 MdsHelper.AppendCachedDurationQuantilesPerMinute(_cachedDurationQuantilesPerMinute, _durationQuantiles, startTime);
+                MdsHelper.AppendListOfDataPoints(_durationQuantiles, _dataPointNames);
                 _dataAccess.SaveData(_cachedDurationQuantilesPerMinute);
 
                 var retrievedData = _dataAccess.GetData(startTime);
@@ -59,14 +61,19 @@ namespace MdsDataAccessClientLibSample
                     new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>();
             }
 
+            _dataAccess.SaveDatapointNames(_dataPointNames);
             Console.ReadKey();
         }
 
         private static IDictionary<string, IDictionary<string, IDictionary<string, List<int>>>> _durationQuantiles =
             new Dictionary<string, IDictionary<string, IDictionary<string, List<int>>>>(StringComparer.OrdinalIgnoreCase);
 
+        private static readonly IDictionary<string, IDictionary<string, HashSet<string>>> _dataPointNames =
+            new Dictionary<string, IDictionary<string, HashSet<string>>>(StringComparer.OrdinalIgnoreCase);
+
         private static IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>> _cachedDurationQuantilesPerMinute =
             new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>();
+
 
         #endregion
 
@@ -96,6 +103,8 @@ namespace MdsDataAccessClientLibSample
             Console.WriteLine("1. Fetching data from MDS");
             var items = _dataAccess.GetDataForTimeRange(DateTime.UtcNow.AddDays(-2),
                 DateTime.UtcNow.AddDays(-2).AddHours(1));
+
+            var quantileDataItems = _dataAccess.GetJsonDataForTimeRange(DateTime.UtcNow.AddHours(-6), DateTime.UtcNow);
             FetechDataUsingAsyncApi();
 
             //Console.WriteLine("2. Fetching MDS tables that matches the reg expression using MdsDataAccessClient.GetTables");
