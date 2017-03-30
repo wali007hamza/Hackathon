@@ -9,10 +9,22 @@
 }
 
 #DurationHeading {
-    padding-top: 3em;
-    margin-top: 5em;
+    margin-top: 2em;
 }
 
 .ClearBoth {
     clear: both;
+}
+
+#divider {
+    border: 0;
+    clear: both;
+    display: block;
+    background-color: darkgrey;
+    height: 1px;
+}
+
+#QueryFormLookBack {
+    padding-bottom: 10em;
+    margin-bottom: 7em;
 }

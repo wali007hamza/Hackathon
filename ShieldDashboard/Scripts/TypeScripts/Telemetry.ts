@@ -83,6 +83,7 @@ module Telemetry {
             var spotTime: string = TelemetryManager.ReadQueryInputs().SpotTime;
             var lookBackHours: number = TelemetryManager.ReadQueryInputs().LookBackHours;
 
+            lookBackHours = Number(1) + Number(lookBackHours);
             Ajax.GetJSON(
                 Urls.GetQuantileDurations,
                 {
@@ -102,6 +103,7 @@ module Telemetry {
 
         public static RenderQuantilePlot(quantileData: IQuantileData): void {
             $('#ResultsContainer').removeClass('hidden');
+            $('#divider').removeClass('hidden');
             var chartData: LinearChartData = TelemetryManager.CreateDurationChartData(quantileData);
             TelemetryManager.RenderLineChart(chartData);
         }
@@ -208,9 +210,9 @@ module Telemetry {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
         }
 
-        private static LookBackAndRenderPlot(quantileDurations: IQuantileData, currentLookBack: number): void {
+        private static LookBackAndRenderPlot(quantileDurations: IQuantileData, lookbackHours: number): void {
             TelemetryManager.RenderQuantilePlot(quantileDurations);
-            $('#InputLookingBack').val(Number(1) + Number(currentLookBack));
+            $('#InputLookingBack').val(lookbackHours);
         }
 
         private static RenderDataList(optionList: string[]): string {

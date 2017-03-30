@@ -29,6 +29,7 @@ var Telemetry;
             var activitySubType = TelemetryManager.ReadQueryInputs().ActivitySubType;
             var spotTime = TelemetryManager.ReadQueryInputs().SpotTime;
             var lookBackHours = TelemetryManager.ReadQueryInputs().LookBackHours;
+            lookBackHours = Number(1) + Number(lookBackHours);
             Ajax.GetJSON(Urls.GetQuantileDurations, {
                 'spotTime': spotTime,
                 'lookBackHours': lookBackHours,
@@ -42,6 +43,7 @@ var Telemetry;
         };
         TelemetryManager.RenderQuantilePlot = function (quantileData) {
             $('#ResultsContainer').removeClass('hidden');
+            $('#divider').removeClass('hidden');
             var chartData = TelemetryManager.CreateDurationChartData(quantileData);
             TelemetryManager.RenderLineChart(chartData);
         };
@@ -125,9 +127,9 @@ var Telemetry;
         TelemetryManager.RenderActivitySubTypes = function (suggestionsResponse) {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
         };
-        TelemetryManager.LookBackAndRenderPlot = function (quantileDurations, currentLookBack) {
+        TelemetryManager.LookBackAndRenderPlot = function (quantileDurations, lookbackHours) {
             TelemetryManager.RenderQuantilePlot(quantileDurations);
-            $('#InputLookingBack').val(Number(1) + Number(currentLookBack));
+            $('#InputLookingBack').val(lookbackHours);
         };
         TelemetryManager.RenderDataList = function (optionList) {
             var generatedOptions = '';
