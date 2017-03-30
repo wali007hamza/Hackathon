@@ -31,7 +31,8 @@ module Telemetry {
 
     interface IQuantileDuration {
         DateTime: string;
-        Quantiles: IQuantiles
+        Count: number;
+        Quantiles: IQuantiles;
     }
 
     interface IQuantiles {
@@ -95,17 +96,87 @@ module Telemetry {
                 },
                 (response) => {
                     var quantileData = JSON.parse(response);
-                    TelemetryManager.LookBackAndRenderPlot(quantileData, lookBackHours);
+                    TelemetryManager.RenderPlots(quantileData, lookBackHours);
                 },
                 () => { },
                 () => { });
         }
 
+        public Load(): void {
+            var activityName: string = TelemetryManager.ReadQueryInputs().ActivityName;
+            var activityType: string = TelemetryManager.ReadQueryInputs().ActivityType;
+            var activitySubType: string = TelemetryManager.ReadQueryInputs().ActivitySubType;
+            var spotTime: string = TelemetryManager.ReadQueryInputs().SpotTime;
+            var lookBackHours: number = TelemetryManager.ReadQueryInputs().LookBackHours;
+
+            Ajax.GetJSON(
+                Urls.GetQuantileDurations,
+                {
+                    'spotTime': spotTime,
+                    'lookBackHours': lookBackHours,
+                    'activityName': activityName,
+                    'activityType': activityType,
+                    'activitySubType': activitySubType
+                },
+                (response) => {
+                    var quantileData = JSON.parse(response);
+                    TelemetryManager.RenderPlots(quantileData, lookBackHours);
+                },
+                () => { },
+                () => { });
+        }
+
+        public static ReadQueryInputs(): IQueryParameters {
+            var activityName: string = $('#InputActivityName').val().trim();
+            var activityType: string = $('#InputActivityType').val().trim();
+            var activtiySubType: string = $('#InputActivitySubType').val().trim();
+            var spotTime: string = $("#InputSpotTime").val().trim();
+            var lookBackHours: number = $('#InputLookingBack').val().trim();
+
+            var result: IQueryParameters = {
+                ActivityName: activityName,
+                ActivityType: activityType,
+                ActivitySubType: activtiySubType,
+                SpotTime: spotTime,
+                LookBackHours: lookBackHours
+            }
+
+            return result;
+        }
+
         public static RenderQuantilePlot(quantileData: IQuantileData): void {
             $('#ResultsContainer').removeClass('hidden');
             $('#divider').removeClass('hidden');
+            $('#divider1').removeClass('hidden');
             var chartData: LinearChartData = TelemetryManager.CreateDurationChartData(quantileData);
-            TelemetryManager.RenderLineChart(chartData);
+            TelemetryManager.RenderLineChart(chartData, 'QuantileDurationPlaceholdler');
+        }
+
+        public static RenderTotalTrafficPlot(quantileData: IQuantileData): void {
+            $('#ResultsContainer').removeClass('hidden');
+            $('#divider').removeClass('hidden');
+            $('#divider1').removeClass('hidden');
+            var chartData: LinearChartData = TelemetryManager.CreateTotalTrafficChartData(quantileData);
+            TelemetryManager.RenderLineChart(chartData, 'TotalTrafficPlaceholdler');
+        }
+
+        private static CreateTotalTrafficChartData(quantileData: IQuantileData): LinearChartData {
+            var datasets: ChartDataSet[] = [];
+            var dateLabels: string[] = quantileData.QuantileDurations.map(q => q.DateTime);
+            var scaling: number = 170 / 6;
+            var chartData: number[] = [];
+            quantileData.QuantileDurations.forEach((q) => {
+                chartData.push(q.Count);
+            });
+
+            datasets.push(TelemetryManager.CreateChartDataSet(chartData, "", [50, 50, 50]));
+            var result: LinearChartData =
+                {
+                    labels: dateLabels,
+                    datasets: datasets
+                };
+
+            return result;
         }
 
         private static CreateDurationChartData(quantileData: IQuantileData): LinearChartData {
@@ -166,8 +237,7 @@ module Telemetry {
             return result;
         }
 
-        private static RenderLineChart(chartData: LinearChartData): void {
-            var placeHolder = 'QuantileDurationPlaceholdler';
+        private static RenderLineChart(chartData: LinearChartData, placeHolder: string): void {
             var canvasId: string = placeHolder + 'Canvas';
             var legendId: string = placeHolder + 'Legend';
 
@@ -184,24 +254,6 @@ module Telemetry {
             $('#' + legendId).html(chart.generateLegend());
         }
 
-        public static ReadQueryInputs(): IQueryParameters {
-            var activityName: string = $('#InputActivityName').val().trim();
-            var activityType: string = $('#InputActivityType').val().trim();
-            var activtiySubType: string = $('#InputActivitySubType').val().trim();
-            var spotTime: string = $("#InputSpotTime").val().trim();
-            var lookBackHours: number = $('#InputLookingBack').val().trim();
-
-            var result: IQueryParameters = {
-                ActivityName: activityName,
-                ActivityType: activityType,
-                ActivitySubType: activtiySubType,
-                SpotTime: spotTime,
-                LookBackHours: lookBackHours
-            }
-
-            return result;
-        }
-
         private static RenderActivityTypes(suggestionsResponse: string[]): void {
             $('#ActivityTypeList').html(this.RenderDataList(suggestionsResponse));
         }
@@ -210,8 +262,9 @@ module Telemetry {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
         }
 
-        private static LookBackAndRenderPlot(quantileDurations: IQuantileData, lookbackHours: number): void {
+        private static RenderPlots(quantileDurations: IQuantileData, lookbackHours: number): void {
             TelemetryManager.RenderQuantilePlot(quantileDurations);
+            TelemetryManager.RenderTotalTrafficPlot(quantileDurations);
             $('#InputLookingBack').val(lookbackHours);
         }
 
@@ -240,6 +293,10 @@ module Telemetry {
             TelemetryManagerInstance.LookBack();
         }
 
+        public static Load(): void {
+            TelemetryManagerInstance.Load();
+        }
+
         public static ClearInput(domName: any): void {
             $(domName.data).val('');
         }
@@ -264,6 +321,7 @@ $(document).ready(() => {
     // Load subtype and metadata suggestions when one of the input fields gets focus.
     $('#InputActivityType').focus(Telemetry.Handlers.LoadActivityTypes);
     $('#InputActivitySubType').focus(Telemetry.Handlers.LoadActivitySubTypes);
+    $('#LoadBtn').click(Telemetry.Handlers.Load);
     $('#LookBackBtn').click(Telemetry.Handlers.LookBack);
     //$("#SearchClearActivityName").click("#InputActivityName", Telemetry.Handlers.ClearInput);
     //$("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearInput);

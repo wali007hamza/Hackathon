@@ -38,14 +38,69 @@ var Telemetry;
                 'activitySubType': activitySubType
             }, function (response) {
                 var quantileData = JSON.parse(response);
-                TelemetryManager.LookBackAndRenderPlot(quantileData, lookBackHours);
+                TelemetryManager.RenderPlots(quantileData, lookBackHours);
             }, function () { }, function () { });
+        };
+        TelemetryManager.prototype.Load = function () {
+            var activityName = TelemetryManager.ReadQueryInputs().ActivityName;
+            var activityType = TelemetryManager.ReadQueryInputs().ActivityType;
+            var activitySubType = TelemetryManager.ReadQueryInputs().ActivitySubType;
+            var spotTime = TelemetryManager.ReadQueryInputs().SpotTime;
+            var lookBackHours = TelemetryManager.ReadQueryInputs().LookBackHours;
+            Ajax.GetJSON(Urls.GetQuantileDurations, {
+                'spotTime': spotTime,
+                'lookBackHours': lookBackHours,
+                'activityName': activityName,
+                'activityType': activityType,
+                'activitySubType': activitySubType
+            }, function (response) {
+                var quantileData = JSON.parse(response);
+                TelemetryManager.RenderPlots(quantileData, lookBackHours);
+            }, function () { }, function () { });
+        };
+        TelemetryManager.ReadQueryInputs = function () {
+            var activityName = $('#InputActivityName').val().trim();
+            var activityType = $('#InputActivityType').val().trim();
+            var activtiySubType = $('#InputActivitySubType').val().trim();
+            var spotTime = $("#InputSpotTime").val().trim();
+            var lookBackHours = $('#InputLookingBack').val().trim();
+            var result = {
+                ActivityName: activityName,
+                ActivityType: activityType,
+                ActivitySubType: activtiySubType,
+                SpotTime: spotTime,
+                LookBackHours: lookBackHours
+            };
+            return result;
         };
         TelemetryManager.RenderQuantilePlot = function (quantileData) {
             $('#ResultsContainer').removeClass('hidden');
             $('#divider').removeClass('hidden');
+            $('#divider1').removeClass('hidden');
             var chartData = TelemetryManager.CreateDurationChartData(quantileData);
-            TelemetryManager.RenderLineChart(chartData);
+            TelemetryManager.RenderLineChart(chartData, 'QuantileDurationPlaceholdler');
+        };
+        TelemetryManager.RenderTotalTrafficPlot = function (quantileData) {
+            $('#ResultsContainer').removeClass('hidden');
+            $('#divider').removeClass('hidden');
+            $('#divider1').removeClass('hidden');
+            var chartData = TelemetryManager.CreateTotalTrafficChartData(quantileData);
+            TelemetryManager.RenderLineChart(chartData, 'TotalTrafficPlaceholdler');
+        };
+        TelemetryManager.CreateTotalTrafficChartData = function (quantileData) {
+            var datasets = [];
+            var dateLabels = quantileData.QuantileDurations.map(function (q) { return q.DateTime; });
+            var scaling = 170 / 6;
+            var chartData = [];
+            quantileData.QuantileDurations.forEach(function (q) {
+                chartData.push(q.Count);
+            });
+            datasets.push(TelemetryManager.CreateChartDataSet(chartData, "", [50, 50, 50]));
+            var result = {
+                labels: dateLabels,
+                datasets: datasets
+            };
+            return result;
         };
         TelemetryManager.CreateDurationChartData = function (quantileData) {
             var datasets = [];
@@ -92,8 +147,7 @@ var Telemetry;
             };
             return result;
         };
-        TelemetryManager.RenderLineChart = function (chartData) {
-            var placeHolder = 'QuantileDurationPlaceholdler';
+        TelemetryManager.RenderLineChart = function (chartData, placeHolder) {
             var canvasId = placeHolder + 'Canvas';
             var legendId = placeHolder + 'Legend';
             var tmpl = "<div class='PlotWrapper'><canvas class='PlotCanvas' id='" +
@@ -106,29 +160,15 @@ var Telemetry;
             var chart = new Chart(ctx).Line(chartData);
             $('#' + legendId).html(chart.generateLegend());
         };
-        TelemetryManager.ReadQueryInputs = function () {
-            var activityName = $('#InputActivityName').val().trim();
-            var activityType = $('#InputActivityType').val().trim();
-            var activtiySubType = $('#InputActivitySubType').val().trim();
-            var spotTime = $("#InputSpotTime").val().trim();
-            var lookBackHours = $('#InputLookingBack').val().trim();
-            var result = {
-                ActivityName: activityName,
-                ActivityType: activityType,
-                ActivitySubType: activtiySubType,
-                SpotTime: spotTime,
-                LookBackHours: lookBackHours
-            };
-            return result;
-        };
         TelemetryManager.RenderActivityTypes = function (suggestionsResponse) {
             $('#ActivityTypeList').html(this.RenderDataList(suggestionsResponse));
         };
         TelemetryManager.RenderActivitySubTypes = function (suggestionsResponse) {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
         };
-        TelemetryManager.LookBackAndRenderPlot = function (quantileDurations, lookbackHours) {
+        TelemetryManager.RenderPlots = function (quantileDurations, lookbackHours) {
             TelemetryManager.RenderQuantilePlot(quantileDurations);
+            TelemetryManager.RenderTotalTrafficPlot(quantileDurations);
             $('#InputLookingBack').val(lookbackHours);
         };
         TelemetryManager.RenderDataList = function (optionList) {
@@ -153,6 +193,9 @@ var Telemetry;
         Handlers.LookBack = function () {
             TelemetryManagerInstance.LookBack();
         };
+        Handlers.Load = function () {
+            TelemetryManagerInstance.Load();
+        };
         Handlers.ClearInput = function (domName) {
             $(domName.data).val('');
         };
@@ -176,6 +219,7 @@ $(document).ready(function () {
     // Load subtype and metadata suggestions when one of the input fields gets focus.
     $('#InputActivityType').focus(Telemetry.Handlers.LoadActivityTypes);
     $('#InputActivitySubType').focus(Telemetry.Handlers.LoadActivitySubTypes);
+    $('#LoadBtn').click(Telemetry.Handlers.Load);
     $('#LookBackBtn').click(Telemetry.Handlers.LookBack);
     //$("#SearchClearActivityName").click("#InputActivityName", Telemetry.Handlers.ClearInput);
     //$("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearInput);

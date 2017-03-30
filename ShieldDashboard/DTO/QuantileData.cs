@@ -18,6 +18,8 @@ namespace ShieldDashboard.DTO
     {
         public DateTime DateTime { get; set; }
 
+        public int Count { get; set; }
+
         public Quantiles Quantiles { get; set; }
     }
 

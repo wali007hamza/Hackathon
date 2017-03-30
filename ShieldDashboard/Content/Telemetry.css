@@ -16,7 +16,7 @@
     clear: both;
 }
 
-#divider {
+#divider, #divider1 {
     border: 0;
     clear: both;
     display: block;
@@ -27,4 +27,8 @@
 #QueryFormLookBack {
     padding-bottom: 10em;
     margin-bottom: 7em;
+}
+
+#TotalTrafficPlaceholdlerLegend {
+    display: none
 }

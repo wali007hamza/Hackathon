@@ -46,24 +46,24 @@ namespace MdsDataAccessClientSample
         }
 
         public static void AppendCachedDurationQuantilesPerMinute(
-            IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>
+            IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>>
                 cachedDurationQuantilesPerMinute, IDictionary<string, IDictionary<string, IDictionary<string, List<int>>>> durationQuantiles, DateTime dateTime)
         {
-            var quantilesToCache = new Dictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>(StringComparer.OrdinalIgnoreCase);
+            var quantilesToCache = new Dictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>(StringComparer.OrdinalIgnoreCase);
             foreach (var kvName in durationQuantiles)
             {
-                IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>> typeValue;
+                IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>> typeValue;
                 if (!quantilesToCache.TryGetValue(kvName.Key, out typeValue))
                 {
-                    typeValue = new Dictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>(StringComparer.OrdinalIgnoreCase);
+                    typeValue = new Dictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>(StringComparer.OrdinalIgnoreCase);
                     quantilesToCache[kvName.Key] = typeValue;
                 }
                 foreach (var kvType in kvName.Value)
                 {
-                    IDictionary<string, Tuple<int, int, int, int, int, int>> subTypeValue;
+                    IDictionary<string, Tuple<int, int, int, int, int, int, int>> subTypeValue;
                     if (!typeValue.TryGetValue(kvType.Key, out subTypeValue))
                     {
-                        subTypeValue = new Dictionary<string, Tuple<int, int, int, int, int, int>>(StringComparer.OrdinalIgnoreCase);
+                        subTypeValue = new Dictionary<string, Tuple<int, int, int, int, int, int, int>>(StringComparer.OrdinalIgnoreCase);
                         typeValue[kvType.Key] = subTypeValue;
                     }
                     foreach (var kvSubType in kvType.Value)
@@ -79,7 +79,7 @@ namespace MdsDataAccessClientSample
                         }
 
                         subTypeValue[kvSubType.Key] =
-                            new Tuple<int, int, int, int, int, int>(sortedList[quantileIndices[0]],
+                            new Tuple<int, int, int, int, int, int, int>(count, sortedList[quantileIndices[0]],
                                 sortedList[quantileIndices[1]], sortedList[quantileIndices[2]],
                                 sortedList[quantileIndices[3]], sortedList[quantileIndices[4]],
                                 sortedList[quantileIndices[5]]);

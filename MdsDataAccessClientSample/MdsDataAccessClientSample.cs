@@ -58,7 +58,7 @@ namespace MdsDataAccessClientLibSample
                 startTime = startTime.AddMinutes(1);
                 _durationQuantiles = new Dictionary<string, IDictionary<string, IDictionary<string, List<int>>>>(StringComparer.OrdinalIgnoreCase);
                 _cachedDurationQuantilesPerMinute =
-                    new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>();
+                    new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>>();
             }
 
             _dataAccess.SaveDatapointNames(_dataPointNames);
@@ -71,8 +71,8 @@ namespace MdsDataAccessClientLibSample
         private static readonly IDictionary<string, IDictionary<string, HashSet<string>>> _dataPointNames =
             new Dictionary<string, IDictionary<string, HashSet<string>>>(StringComparer.OrdinalIgnoreCase);
 
-        private static IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>> _cachedDurationQuantilesPerMinute =
-            new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int>>>>>();
+        private static IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>> _cachedDurationQuantilesPerMinute =
+            new Dictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>>();
 
 
         #endregion

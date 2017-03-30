@@ -114,7 +114,7 @@ namespace ShieldDashboard.Controllers
                 var retrievedValue = await redisDB.HashGetAsync(DurationQuantilesUrn, key);
                 if (retrievedValue.HasValue)
                 {
-                    var data = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, Tuple<int, int, int, int, int, int>>>>>(retrievedValue);
+                    var data = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, Tuple<int, int, int, int, int, int, int>>>>>(retrievedValue);
                     if (string.IsNullOrWhiteSpace(dataPointName) || dataPointName == "_emptyName_")
                     {
                         dataPointName = data.Keys.First(x => x != string.Empty && x.ToLower() != "_empytname_");
@@ -137,14 +137,15 @@ namespace ShieldDashboard.Controllers
                         quantileData.QuantileDurations.Add(new QuantileDuration
                         {
                             DateTime = startTime,
+                            Count = tupleValues.Item1,
                             Quantiles = new Quantiles
                             {
-                                Item1 = tupleValues.Item1,
-                                Item2 = tupleValues.Item2,
-                                Item3 = tupleValues.Item3,
-                                Item4 = tupleValues.Item4,
-                                Item5 = tupleValues.Item5,
-                                Item6 = tupleValues.Item6
+                                Item1 = tupleValues.Item2,
+                                Item2 = tupleValues.Item3,
+                                Item3 = tupleValues.Item4,
+                                Item4 = tupleValues.Item5,
+                                Item5 = tupleValues.Item6,
+                                Item6 = tupleValues.Item7
                             }
                         });
 
