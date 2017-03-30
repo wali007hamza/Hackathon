@@ -99,6 +99,77 @@ module Telemetry {
                 () => { });
         }
 
+        public static RenderQuantilePlot(quantileData: IQuantileData): void {
+            var chartData: LinearChartData = TelemetryManager.CreateDurationChartData(quantileData);
+            TelemetryManager.RenderLineChart(chartData);
+        }
+
+        private static CreateDurationChartData(quantileData: IQuantileData): LinearChartData {
+            var datasets: ChartDataSet[] = [];
+
+            var dateLabels: string[] = quantileData.QuantileDurations.map(q => q.DateTime);
+            var scaling: number = 170 / 6;
+
+            var chartData: { [key: string]: number[]; } = {};
+            // Create data set for every quantile and append to datasets.
+            quantileData.QuantileDurations.forEach((q) => {
+                chartData[0.5].push(q.Quantiles.Item1);
+                chartData[0.75].push(q.Quantiles.Item2);
+                chartData[0.99].push(q.Quantiles.Item3);
+                chartData[0.999].push(q.Quantiles.Item4);
+                chartData[0.9999].push(q.Quantiles.Item5);
+                chartData[0.99995].push(q.Quantiles.Item6);
+            });
+
+            var idx = 0;
+            for (var key in chartData) {
+                datasets.push(TelemetryManager
+                    .CreateChartDataSet(chartData[key],
+                    "p(" + key + ")",
+                    [50 + (idx + 1) * scaling, 220 - (idx + 1) * scaling, 50]));
+                idx++;
+            }
+
+            var result: LinearChartData =
+                {
+                    labels: dateLabels,
+                    datasets: datasets
+                };
+
+            return result;
+        }
+
+        private static CreateChartDataSet(values: number[], label: string, color: number[]): ChartDataSet {
+            // css colors may only have whole numbers, no decimal parts.
+            var colorStr: string[] = color.map(x => x.toFixed(0));
+
+            var result: ChartDataSet =
+                {
+                    label: label,
+                    fillColor: "rgba(0,0,0,0)",
+                    strokeColor: "rgba(" + colorStr[0] + "," + colorStr[1] + "," + colorStr[2] + ",1)",
+                    pointColor: "rgba(" + colorStr[0] + "," + colorStr[1] + "," + colorStr[2] + ",1)",
+                    pointStrokeColor: "#fff",
+                    data: values
+                };
+
+            return result;
+        }
+
+        private static RenderLineChart(chartData: LinearChartData): void {
+            var placeHolder = 'QuantileDurationPlaceholder';
+            var canvasId: string = placeHolder + 'Canvas';
+            var legendId: string = placeHolder + 'Legend';
+
+            $('#' + placeHolder).html(TemplateEngine.Render('PlotCanvas', { CanvasId: canvasId, LegendId: legendId }));
+
+            var ctx: CanvasRenderingContext2D = $('#' + canvasId).get(0).getContext('2d');
+
+            var chart: LinearInstance = new Chart(ctx).Line(chartData);
+
+            $('#' + legendId).html(chart.generateLegend());
+        }
+
         public static ReadQueryInputs(): IQueryParameters {
             var activityName: string = $('#InputActivityName').val().trim();
             var activityType: string = $('#InputActivityType').val().trim();

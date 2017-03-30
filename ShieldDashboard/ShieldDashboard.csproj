@@ -275,10 +275,12 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\Definitions\chart.d.ts" />
+    <TypeScriptCompile Include="Scripts\Definitions\HTMLElement.d.ts" />
     <TypeScriptCompile Include="Scripts\Definitions\jquery-3.1.1.d.ts" />
     <TypeScriptCompile Include="Scripts\Definitions\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\TypeScripts\Shared\Shared.ts" />
     <TypeScriptCompile Include="Scripts\TypeScripts\Shared\SharedModules.ts" />
+    <TypeScriptCompile Include="Scripts\TypeScripts\Shared\templateEngine.ts" />
     <TypeScriptCompile Include="Scripts\TypeScripts\Telemetry.ts" />
   </ItemGroup>
   <ItemGroup>

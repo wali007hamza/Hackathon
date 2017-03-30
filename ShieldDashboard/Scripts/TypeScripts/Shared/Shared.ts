@@ -1,4 +1,5 @@
 ﻿/// <reference path="SharedModules.ts" />
+/// <reference path="templateEngine.ts" />
 
 var globalObjects: any = window;
 var Urls: any = globalObjects.Url || {};
