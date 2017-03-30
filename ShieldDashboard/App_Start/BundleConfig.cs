@@ -15,7 +15,8 @@ namespace ShieldDashboard
                         "~/Scripts/jquery.validate*"));
 
             bundles.Add(new ScriptBundle("~/bundles/js/shared").Include(
-                "~/Scripts/TypeScripts/Shared/*.js"));
+                "~/Scripts/TypeScripts/Shared/*.js",
+                "~/Scripts/Chart.min.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/js/telemetry").Include(
                 "~/Scripts/TypeScripts/*.js"));
@@ -32,6 +33,9 @@ namespace ShieldDashboard
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            bundles.Add(new StyleBundle("~/Content/css/telemetry").Include(
+                      "~/Content/Telemetry.css"));
         }
     }
 }

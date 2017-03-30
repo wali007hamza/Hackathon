@@ -54,3 +54,8 @@
     cursor: pointer;
     color: #ccc;
 }
+
+#LoadingScreen {
+    text-align: center;
+}
+

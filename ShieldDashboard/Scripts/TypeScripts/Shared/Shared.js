@@ -1,5 +1,4 @@
 /// <reference path="SharedModules.ts" />
-/// <reference path="templateEngine.ts" />
 var globalObjects = window;
 var Urls = globalObjects.Url || {};
 var Ajax = (function () {
@@ -38,4 +37,3 @@ var Ajax = (function () {
     };
     return Ajax;
 }());
-//# sourceMappingURL=Shared.js.map

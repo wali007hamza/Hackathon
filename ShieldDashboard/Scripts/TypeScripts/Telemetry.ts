@@ -1,4 +1,5 @@
 ﻿/// <reference path="Shared/Shared.ts" />
+/// <reference path="../Definitions/chart.d.ts" />
 
 module Telemetry {
     interface IActivityListResponse {
@@ -93,13 +94,14 @@ module Telemetry {
                 },
                 (response) => {
                     var quantileData = JSON.parse(response);
-                    TelemetryManager.RenderQantileDurations(quantileData, lookBackHours);
+                    TelemetryManager.LookBackAndRenderPlot(quantileData, lookBackHours);
                 },
                 () => { },
                 () => { });
         }
 
         public static RenderQuantilePlot(quantileData: IQuantileData): void {
+            $('#ResultsContainer').removeClass('hidden');
             var chartData: LinearChartData = TelemetryManager.CreateDurationChartData(quantileData);
             TelemetryManager.RenderLineChart(chartData);
         }
@@ -111,14 +113,20 @@ module Telemetry {
             var scaling: number = 170 / 6;
 
             var chartData: { [key: string]: number[]; } = {};
+            chartData["0.5"] = [];
+            chartData["0.75"] = [];
+            chartData["0.99"] = [];
+            chartData["0.999"] = [];
+            chartData["0.9999"] = [];
+            chartData["0.99995"] = [];
             // Create data set for every quantile and append to datasets.
             quantileData.QuantileDurations.forEach((q) => {
-                chartData[0.5].push(q.Quantiles.Item1);
-                chartData[0.75].push(q.Quantiles.Item2);
-                chartData[0.99].push(q.Quantiles.Item3);
-                chartData[0.999].push(q.Quantiles.Item4);
-                chartData[0.9999].push(q.Quantiles.Item5);
-                chartData[0.99995].push(q.Quantiles.Item6);
+                chartData["0.5"].push(q.Quantiles.Item1);
+                chartData["0.75"].push(q.Quantiles.Item2);
+                chartData["0.99"].push(q.Quantiles.Item3);
+                chartData["0.999"].push(q.Quantiles.Item4);
+                chartData["0.9999"].push(q.Quantiles.Item5);
+                chartData["0.99995"].push(q.Quantiles.Item6);
             });
 
             var idx = 0;
@@ -157,12 +165,16 @@ module Telemetry {
         }
 
         private static RenderLineChart(chartData: LinearChartData): void {
-            var placeHolder = 'QuantileDurationPlaceholder';
+            var placeHolder = 'QuantileDurationPlaceholdler';
             var canvasId: string = placeHolder + 'Canvas';
             var legendId: string = placeHolder + 'Legend';
 
-            $('#' + placeHolder).html(TemplateEngine.Render('PlotCanvas', { CanvasId: canvasId, LegendId: legendId }));
-
+            var tmpl: string = "<div class='PlotWrapper'><canvas class='PlotCanvas' id='" +
+                canvasId +
+                "'></canvas></div><div class='LegendWrapper' id='" +
+                legendId +
+                "'></div><div class='ClearBoth'></div>";
+            $('#' + placeHolder).html(tmpl);
             var ctx: CanvasRenderingContext2D = $('#' + canvasId).get(0).getContext('2d');
 
             var chart: LinearInstance = new Chart(ctx).Line(chartData);
@@ -196,9 +208,8 @@ module Telemetry {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
         }
 
-        private static RenderQantileDurations(quantileDurations: IQuantileData, currentLookBack: number): void {
-            var name = quantileDurations.Name;
-            var subType = quantileDurations.SubType;
+        private static LookBackAndRenderPlot(quantileDurations: IQuantileData, currentLookBack: number): void {
+            TelemetryManager.RenderQuantilePlot(quantileDurations);
             $('#InputLookingBack').val(Number(1) + Number(currentLookBack));
         }
 
@@ -234,6 +245,11 @@ module Telemetry {
 
     export function Init(): void {
         TelemetryManagerInstance = new TelemetryManager();
+        //// Set global plot options.
+        //// Show dataset label in tooltips.
+        //Chart.defaults.global.multiTooltipTemplate = "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=value %>";
+        //// Add a leading space to scale labels to work around truncation issues.
+        //Chart.defaults.global.scaleLabel = " <%=value%>";
     }
 }
 

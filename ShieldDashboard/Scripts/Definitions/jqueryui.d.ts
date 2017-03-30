@@ -1753,10 +1753,10 @@ interface JQuery {
 
     widget: JQueryUI.Widget;
 
-    jQuery: JQueryStatic;
+    jQuery: IJQueryStatic;
 }
 
-interface JQueryStatic {
+interface IJQueryStatic {
     ui: JQueryUI.UI;
     datepicker: JQueryUI.Datepicker;
     widget: JQueryUI.Widget;

@@ -1,6 +1,7 @@
 ﻿@{
     ViewBag.Title = "Telemetry";
     ViewBag.ScriptsBundle = "~/bundles/js/telemetry";
+    @Styles.Render("~/Content/css/telemetry")
 }
 
 @section datascript{
@@ -20,14 +21,14 @@
     @{ Html.RenderPartial("_Tmpl_PlotCanvas");}
 }
 
-<div id="TelemetryWrapper" class="container-fluid">
+<div id="TelemetryWrapper" class="container row">
     <div id="QueryWrapper">
         <h2 class="headline">Acitivity durations in quantiles:</h2>
-        <form id="QueryForm">
-            <div class="col-xs-6">
+        <section class="col-xs-12 col-lg-6">
+            <form id="QueryForm">
                 <div class="col-xs-12 form-group has-clear">
                     <label for="InputActivityName" class="control-label">ActivityName</label>
-                    <input class="form-control" type="text" id="InputActivityName" list="ActivityNameList" value="@ViewBag.FirstActivity.Name"/>
+                    <input class="form-control" type="text" id="InputActivityName" list="ActivityNameList" value="@ViewBag.FirstActivity.Name" />
                     <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
                     <datalist id="ActivityNameList">
                         @foreach (var activityName in ViewBag.ActivityNames)
@@ -38,42 +39,50 @@
                 </div>
                 <div class="form-group col-xs-6 has-clear">
                     <label for="InputActivityType" class="control-label">ActivityType</label>
-                    <input class="form-control" type="text" id="InputActivityType" list="ActivityTypeList" value="@ViewBag.FirstActivity.Type"/>
+                    <input class="form-control" type="text" id="InputActivityType" list="ActivityTypeList" value="@ViewBag.FirstActivity.Type" />
                     <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
                     <datalist id="ActivityTypeList"></datalist>
                 </div>
                 <div class="form-group col-xs-6 has-clear">
                     <label for="InputActivitySubType" class="control-label">ActivitySubType</label>
-                    <input class="form-control" type="text" id="InputActivitySubType" list="ActivitySubTypeList" value="@ViewBag.FirstActivity.SubType"/>
+                    <input class="form-control" type="text" id="InputActivitySubType" list="ActivitySubTypeList" value="@ViewBag.FirstActivity.SubType" />
                     <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
                     <datalist id="ActivitySubTypeList"></datalist>
                 </div>
-            </div>
-            <div class="col-xs-6">
-                <div class="form-group col-xs-6">
-                    <label class="control-label" for="InputSpotTime">SpotTime</label>
-                    <input class="form-control" type="text" id="InputSpotTime" disabled="" value="@DateTime.UtcNow"/>
+                <div class="form-group col-xs-6 has-clear">
+                    <button type="submit" id="LoadBtn" class="btn btn-lg btn-submit">Load</button>
                 </div>
-                <div class="form-group col-xs-3">
-                    <label class="control-label" for="InputLookingBack">LookingBack</label>
-                    <input class="form-control" type="text" id="InputLookingBack" />
-                </div>
-                <div class="form-group col-xs-3 lookBackBtn">
-                    <button type="button" id="LookBackBtn" class="btn btn-submit">LookBack</button>
-                </div>
+            </form>
+        </section>
+        <section class="col-xs-12 col-lg-6">
+            <div class="col-xs-12">
+                <form id="QueryFormLookBack">
+                    <div class="form-group col-xs-5">
+                        <label class="control-label" for="InputSpotTime">SpotTime</label>
+                        <input class="form-control" type="text" id="InputSpotTime" disabled="" value="@DateTime.UtcNow" />
+                    </div>
+                    <div class="form-group col-xs-3">
+                        <label class="control-label" for="InputLookingBack">LookingBack</label>
+                        <input class="form-control" type="text" id="InputLookingBack" />
+                    </div>
+                    <div class="form-group col-xs-4 lookBackBtn">
+                        <button type="button" id="LookBackBtn" class="btn btn-submit">LookBack</button>
+                    </div>
+                </form>
             </div>
-            <div class="col-xs-6">
-                <button type="submit" id="LoadBtn" class="btn btn-lg btn-submit">Load</button>
-            </div>
-        </form>
+            @*<div class="col-xs-12">
+                    <div id="LoadingScreen">
+                        <div id="RequestSpinner"></div>
+                        <h2>Loading...</h2>
+                    </div>
+                </div>*@
+        </section>
     </div>
-    <div id="LoadingScreen">
-        <div id="RequestSpinner"></div>
-        <h2>Loading...</h2>
-    </div>
+    <hr />
+    <br />
     <div id="ErrorPlaceholder"></div>
     <div id="ResultsContainer" class="hidden">
-        <h3 id="QuantileDurationHeading">Durations [ms]</h3>
+        <h3 id="DurationHeading">Durations [ms]</h3>
         <div id="QuantileDurationPlaceholdler"></div>
     </div>
 </div>

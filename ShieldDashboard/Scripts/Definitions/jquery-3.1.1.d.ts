@@ -621,7 +621,7 @@ interface JQueryEasingFunctions {
 /**
  * Static members of jQuery (those on $ and jQuery themselves)
  */
-interface JQueryStatic {
+interface IJQueryStatic {
 
     /**
      * Perform an asynchronous HTTP (Ajax) request.
@@ -775,7 +775,7 @@ interface JQueryStatic {
      *
      * @param callback A function to execute after the DOM is ready.
      */
-    (callback: (jQueryAlias?: JQueryStatic) => any): JQuery;
+    (callback: (jQueryAlias?: IJQueryStatic) => any): JQuery;
 
     /**
      * Accepts a string containing a CSS selector which is then used to match a set of elements.
@@ -817,7 +817,7 @@ interface JQueryStatic {
      *
      * @param removeAll A Boolean indicating whether to remove all jQuery variables from the global scope (including jQuery itself).
      */
-    noConflict(removeAll?: boolean): JQueryStatic;
+    noConflict(removeAll?: boolean): IJQueryStatic;
 
     /**
      * Provides a way to execute callback functions based on one or more objects, usually Deferred objects that represent asynchronous events.
@@ -2428,7 +2428,7 @@ interface JQuery {
      *
      * @param handler A function to execute after the DOM is ready.
      */
-    ready(handler: (jQueryAlias?: JQueryStatic) => any): JQuery;
+    ready(handler: (jQueryAlias?: IJQueryStatic) => any): JQuery;
 
     /**
      * Trigger the "resize" event on an element.
@@ -3238,5 +3238,5 @@ interface JQuery {
 declare module "jquery" {
     export = $;
 }
-declare var jQuery: JQueryStatic;
-declare var $: JQueryStatic;
+declare var jQuery: IJQueryStatic;
+declare var $: IJQueryStatic;

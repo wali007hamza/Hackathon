@@ -1,4 +1,5 @@
 /// <reference path="Shared/Shared.ts" />
+/// <reference path="../Definitions/chart.d.ts" />
 var Telemetry;
 (function (Telemetry) {
     var TelemetryManager = (function () {
@@ -36,10 +37,11 @@ var Telemetry;
                 'activitySubType': activitySubType
             }, function (response) {
                 var quantileData = JSON.parse(response);
-                TelemetryManager.RenderQantileDurations(quantileData, lookBackHours);
+                TelemetryManager.LookBackAndRenderPlot(quantileData, lookBackHours);
             }, function () { }, function () { });
         };
         TelemetryManager.RenderQuantilePlot = function (quantileData) {
+            $('#ResultsContainer').removeClass('hidden');
             var chartData = TelemetryManager.CreateDurationChartData(quantileData);
             TelemetryManager.RenderLineChart(chartData);
         };
@@ -48,14 +50,20 @@ var Telemetry;
             var dateLabels = quantileData.QuantileDurations.map(function (q) { return q.DateTime; });
             var scaling = 170 / 6;
             var chartData = {};
+            chartData["0.5"] = [];
+            chartData["0.75"] = [];
+            chartData["0.99"] = [];
+            chartData["0.999"] = [];
+            chartData["0.9999"] = [];
+            chartData["0.99995"] = [];
             // Create data set for every quantile and append to datasets.
             quantileData.QuantileDurations.forEach(function (q) {
-                chartData[0.5].push(q.Quantiles.Item1);
-                chartData[0.75].push(q.Quantiles.Item2);
-                chartData[0.99].push(q.Quantiles.Item3);
-                chartData[0.999].push(q.Quantiles.Item4);
-                chartData[0.9999].push(q.Quantiles.Item5);
-                chartData[0.99995].push(q.Quantiles.Item6);
+                chartData["0.5"].push(q.Quantiles.Item1);
+                chartData["0.75"].push(q.Quantiles.Item2);
+                chartData["0.99"].push(q.Quantiles.Item3);
+                chartData["0.999"].push(q.Quantiles.Item4);
+                chartData["0.9999"].push(q.Quantiles.Item5);
+                chartData["0.99995"].push(q.Quantiles.Item6);
             });
             var idx = 0;
             for (var key in chartData) {
@@ -83,10 +91,15 @@ var Telemetry;
             return result;
         };
         TelemetryManager.RenderLineChart = function (chartData) {
-            var placeHolder = 'QuantileDurationPlaceholder';
+            var placeHolder = 'QuantileDurationPlaceholdler';
             var canvasId = placeHolder + 'Canvas';
             var legendId = placeHolder + 'Legend';
-            $('#' + placeHolder).html(TemplateEngine.Render('PlotCanvas', { CanvasId: canvasId, LegendId: legendId }));
+            var tmpl = "<div class='PlotWrapper'><canvas class='PlotCanvas' id='" +
+                canvasId +
+                "'></canvas></div><div class='LegendWrapper' id='" +
+                legendId +
+                "'></div><div class='ClearBoth'></div>";
+            $('#' + placeHolder).html(tmpl);
             var ctx = $('#' + canvasId).get(0).getContext('2d');
             var chart = new Chart(ctx).Line(chartData);
             $('#' + legendId).html(chart.generateLegend());
@@ -112,9 +125,8 @@ var Telemetry;
         TelemetryManager.RenderActivitySubTypes = function (suggestionsResponse) {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
         };
-        TelemetryManager.RenderQantileDurations = function (quantileDurations, currentLookBack) {
-            var name = quantileDurations.Name;
-            var subType = quantileDurations.SubType;
+        TelemetryManager.LookBackAndRenderPlot = function (quantileDurations, currentLookBack) {
+            TelemetryManager.RenderQuantilePlot(quantileDurations);
             $('#InputLookingBack').val(Number(1) + Number(currentLookBack));
         };
         TelemetryManager.RenderDataList = function (optionList) {
@@ -147,6 +159,11 @@ var Telemetry;
     Telemetry.Handlers = Handlers;
     function Init() {
         TelemetryManagerInstance = new TelemetryManager();
+        //// Set global plot options.
+        //// Show dataset label in tooltips.
+        //Chart.defaults.global.multiTooltipTemplate = "<%if (datasetLabel){%><%=datasetLabel%>: <%}%><%=value %>";
+        //// Add a leading space to scale labels to work around truncation issues.
+        //Chart.defaults.global.scaleLabel = " <%=value%>";
     }
     Telemetry.Init = Init;
 })(Telemetry || (Telemetry = {}));
@@ -171,4 +188,3 @@ $(document).ready(function () {
             .trigger('propertychange').focus();
     });
 });
-//# sourceMappingURL=Telemetry.js.map

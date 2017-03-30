@@ -38,4 +38,3 @@ var TemplateEngine = (function () {
     TemplateEngine.Cache = {};
     return TemplateEngine;
 }());
-//# sourceMappingURL=templateEngine.js.map
