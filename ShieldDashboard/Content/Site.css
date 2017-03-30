@@ -33,12 +33,24 @@
     padding-bottom: 30px;
 }
 
-.rewindBtn {
+.lookBackBtn {
     padding-top: 22px;
     position: relative;
     bottom: 0;
 }
 
 #LoadBtn {
-    align-content: center
+    align-content: center;
+}
+
+.form-control-clear {
+    position: absolute;
+    right: 50px;
+    top: 20px;
+    bottom: 0;
+    height: 14px;
+    margin: auto;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ccc;
 }

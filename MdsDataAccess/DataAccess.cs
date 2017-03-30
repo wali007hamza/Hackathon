@@ -21,7 +21,7 @@ namespace MdsDataAccess
             var hashList = new List<HashEntry>();
             foreach (var kv in durationQuantiles)
             {
-                hashList.Add(new HashEntry(JsonConvert.SerializeObject(kv.Key.Truncate(TimeSpan.FromMinutes(1))), JsonConvert.SerializeObject(kv.Value)));
+                hashList.Add(new HashEntry(kv.Key.Truncate(TimeSpan.FromMinutes(1)).Ticks, JsonConvert.SerializeObject(kv.Value)));
             }
 
             redisDb.HashSet("urn:durationQuantiles", hashList.ToArray());
@@ -31,7 +31,7 @@ namespace MdsDataAccess
         {
             var redisDb = _redis.Value.GetDatabase();
 
-            var key = JsonConvert.SerializeObject(dateTime.Truncate(TimeSpan.FromMinutes(1)));
+            var key = dateTime.Truncate(TimeSpan.FromMinutes(1)).Ticks;
             var retrievedValue = redisDb.HashGet("urn:durationQuantiles", key);
 
             return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, Tuple<int, int, int, int, int, int>>>>>(retrievedValue);
@@ -46,7 +46,7 @@ namespace MdsDataAccess
             var dataForTimeRange = new List<IDictionary<string, Dictionary<string, Dictionary<string, Tuple<int, int, int, int, int, int>>>>>();
             while (startTime < endTime)
             {
-                var key = JsonConvert.SerializeObject(endTime);
+                var key = endTime.Ticks;
                 var retrievedValue = redisDb.HashGet("urn:durationQuantiles", key);
                 if (retrievedValue.HasValue)
                 {
@@ -90,7 +90,7 @@ namespace MdsDataAccess
             var dataPointSubType = subType;
             while (startTime < endTime)
             {
-                var key = JsonConvert.SerializeObject(startTime);
+                var key = startTime.Ticks;
                 var retrievedValue = redisDb.HashGet("urn:datapoints", key);
                 if (retrievedValue.HasValue)
                 {

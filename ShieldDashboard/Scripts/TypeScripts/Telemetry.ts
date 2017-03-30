@@ -17,7 +17,29 @@ module Telemetry {
         ActivityName: string;
         ActivityType: string;
         ActivitySubType: string;
-        RewindHours: string;
+        SpotTime: string;
+        LookBackHours: number;
+    }
+
+    interface IQuantileData {
+        Name: string;
+        Type: string;
+        SubType: string;
+        QuantileDurations: IQuantileDuration[];
+    }
+
+    interface IQuantileDuration {
+        DateTime: string;
+        Quantiles: IQuantiles
+    }
+
+    interface IQuantiles {
+        Item1: number;
+        Item2: number;
+        Item3: number;
+        Item4: number;
+        Item5: number;
+        Item6: number;
     }
 
     class TelemetryManager {
@@ -53,17 +75,43 @@ module Telemetry {
                 () => { });
         }
 
+        public LookBack(): void {
+            var activityName: string = TelemetryManager.ReadQueryInputs().ActivityName;
+            var activityType: string = TelemetryManager.ReadQueryInputs().ActivityType;
+            var activitySubType: string = TelemetryManager.ReadQueryInputs().ActivitySubType;
+            var spotTime: string = TelemetryManager.ReadQueryInputs().SpotTime;
+            var lookBackHours: number = TelemetryManager.ReadQueryInputs().LookBackHours;
+
+            Ajax.GetJSON(
+                Urls.GetQuantileDurations,
+                {
+                    'spotTime': spotTime,
+                    'lookBackHours': lookBackHours,
+                    'activityName': activityName,
+                    'activityType': activityType,
+                    'activitySubType': activitySubType
+                },
+                (response) => {
+                    var quantileData = JSON.parse(response);
+                    TelemetryManager.RenderQantileDurations(quantileData, lookBackHours);
+                },
+                () => { },
+                () => { });
+        }
+
         public static ReadQueryInputs(): IQueryParameters {
             var activityName: string = $('#InputActivityName').val().trim();
             var activityType: string = $('#InputActivityType').val().trim();
             var activtiySubType: string = $('#InputActivitySubType').val().trim();
-            var rewindHours: string = $('#InputRewindHours').val().trim();
+            var spotTime: string = $("#InputSpotTime").val().trim();
+            var lookBackHours: number = $('#InputLookingBack').val().trim();
 
             var result: IQueryParameters = {
                 ActivityName: activityName,
                 ActivityType: activityType,
                 ActivitySubType: activtiySubType,
-                RewindHours: rewindHours
+                SpotTime: spotTime,
+                LookBackHours: lookBackHours
             }
 
             return result;
@@ -75,6 +123,12 @@ module Telemetry {
 
         private static RenderActivitySubTypes(suggestionsResponse: string[]): void {
             $('#ActivitySubTypeList').html(this.RenderDataList(suggestionsResponse));
+        }
+
+        private static RenderQantileDurations(quantileDurations: IQuantileData, currentLookBack: number): void {
+            var name = quantileDurations.Name;
+            var subType = quantileDurations.SubType;
+            $('#InputLookingBack').val(Number(1) + Number(currentLookBack));
         }
 
         private static RenderDataList(optionList: string[]): string {
@@ -97,6 +151,14 @@ module Telemetry {
         public static LoadActivitySubTypes(): void {
             TelemetryManagerInstance.LoadActivitySubTypes();
         }
+
+        public static LookBack(): void {
+            TelemetryManagerInstance.LookBack();
+        }
+
+        public static ClearInput(domName: any): void {
+            $(domName.data).val('');
+        }
     }
 
     export function Init(): void {
@@ -106,7 +168,26 @@ module Telemetry {
 
 $(document).ready(() => {
     Telemetry.Init();
+
+    // Defaults
+    $('#InputLookingBack').val("2");
+
     // Load subtype and metadata suggestions when one of the input fields gets focus.
     $('#InputActivityType').focus(Telemetry.Handlers.LoadActivityTypes);
     $('#InputActivitySubType').focus(Telemetry.Handlers.LoadActivitySubTypes);
+    $('#LookBackBtn').click(Telemetry.Handlers.LookBack);
+    //$("#SearchClearActivityName").click("#InputActivityName", Telemetry.Handlers.ClearInput);
+    //$("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearInput);
+    //$("#SearchClearActivitySubType").click("#InputActivitySubType", Telemetry.Handlers.ClearInput);
+
+    $('.has-clear input[type="text"]').on('input propertychange', function () {
+        var $this = $(this);
+        var visible = Boolean($this.val());
+        $this.siblings('.form-control-clear').toggleClass('hidden', !visible);
+    }).trigger('propertychange');
+
+    $('.form-control-clear').click(function () {
+        $(this).siblings('input[type="text"]').val('')
+            .trigger('propertychange').focus();
+    });
 });

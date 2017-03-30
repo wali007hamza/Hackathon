@@ -7,10 +7,10 @@
         string title = $"OLS Shield Dashboard - {ViewBag.Title}";
     }
     <title>@title</title>
-    @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr", "~/bundles/js/shared")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/css")
     @RenderSection("datascript", required: false)
     @RenderSection("templates", required: false)
 
