@@ -37,4 +37,3 @@ var Ajax = (function () {
     };
     return Ajax;
 }());
-//# sourceMappingURL=Shared.js.map

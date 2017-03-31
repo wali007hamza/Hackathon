@@ -91,8 +91,9 @@ namespace ShieldDashboard.Controllers
             string activityType,
             string activitySubType)
         {
-            var endTime= DateTime.Parse(spotTime).Truncate(TimeSpan.FromMinutes(1));
-            var startTime = endTime.AddHours(-int.Parse(lookBackHours));
+            var lookBackHoursInt = int.Parse(lookBackHours);
+            var endTime = DateTime.Parse(spotTime).Truncate(TimeSpan.FromMinutes(1));
+            var startTime = endTime.AddHours(-lookBackHoursInt);
 
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
             var redisDB = redis.GetDatabase();
@@ -108,6 +109,9 @@ namespace ShieldDashboard.Controllers
             var dataPointName = activityName;
             var dataPointType = activityType;
             var dataPointSubType = activitySubType;
+            var combinationFactor = (int)Math.Ceiling(lookBackHoursInt / 2.0);
+            var counter = 1;
+            var aggregatedQuantileDuration = new List<QuantileDuration>();
             while (startTime < endTime)
             {
                 var key = startTime.Ticks;
@@ -115,26 +119,10 @@ namespace ShieldDashboard.Controllers
                 if (retrievedValue.HasValue)
                 {
                     var data = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, Tuple<int, int, int, int, int, int, int>>>>>(retrievedValue);
-                    if (string.IsNullOrWhiteSpace(dataPointName) || dataPointName == "_emptyName_")
-                    {
-                        dataPointName = data.Keys.First(x => x != string.Empty && x.ToLower() != "_empytname_");
-                        quantileData.Name = dataPointName;
-                    }
-                    if (string.IsNullOrWhiteSpace(dataPointType) || dataPointType == "_emptyType_")
-                    {
-                        dataPointType = data[dataPointName].Keys.First(x => x != string.Empty && x.ToLower() != "_emptyType_");
-                        quantileData.Type = dataPointType;
-                    }
-                    if (string.IsNullOrWhiteSpace(dataPointSubType) || dataPointSubType == "_emptySubType_")
-                    {
-                        dataPointSubType =
-                            data[dataPointName][dataPointType].Keys.First(x => x != string.Empty && x.ToLower() != "_emptySubType_");
-                        quantileData.SubType = dataPointSubType;
-                    }
                     try
                     {
                         var tupleValues = data[dataPointName][dataPointType][dataPointSubType];
-                        quantileData.QuantileDurations.Add(new QuantileDuration
+                        aggregatedQuantileDuration.Add(new QuantileDuration
                         {
                             DateTime = startTime,
                             Count = tupleValues.Item1,
@@ -148,13 +136,13 @@ namespace ShieldDashboard.Controllers
                                 Item6 = tupleValues.Item7
                             }
                         });
-
                     }
                     catch
                     {
-                        quantileData.QuantileDurations.Add(new QuantileDuration
+                        aggregatedQuantileDuration.Add(new QuantileDuration
                         {
                             DateTime = startTime,
+                            Count = 0,
                             Quantiles = new Quantiles
                             {
                                 Item1 = 0,
@@ -166,6 +154,29 @@ namespace ShieldDashboard.Controllers
                             }
                         });
                     }
+
+                    if (counter == combinationFactor)
+                    {
+                        quantileData.QuantileDurations.Add(new QuantileDuration
+                        {
+                            DateTime = aggregatedQuantileDuration[0].DateTime,
+                            Count = aggregatedQuantileDuration.Select(x => x.Count).Sum(),
+                            Quantiles = new Quantiles
+                            {
+                                Item1 = aggregatedQuantileDuration.Select(x => x.Quantiles.Item1).Sum() / combinationFactor,
+                                Item2 = aggregatedQuantileDuration.Select(x => x.Quantiles.Item2).Sum() / combinationFactor,
+                                Item3 = aggregatedQuantileDuration.Select(x => x.Quantiles.Item3).Sum() / combinationFactor,
+                                Item4 = aggregatedQuantileDuration.Select(x => x.Quantiles.Item4).Sum() / combinationFactor,
+                                Item5 = aggregatedQuantileDuration.Select(x => x.Quantiles.Item5).Sum() / combinationFactor,
+                                Item6 = aggregatedQuantileDuration.Select(x => x.Quantiles.Item6).Sum() / combinationFactor
+                            }
+                        });
+
+                        aggregatedQuantileDuration = new List<QuantileDuration>();
+                        counter = 0;
+                    }
+
+                    counter++;
                 }
 
                 startTime = startTime.AddMinutes(1);

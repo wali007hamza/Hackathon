@@ -141,7 +141,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="MdsLogMiner - Web Deploy.pubxml" />
     <None Include="packages.config" />
+    <None Include="Properties\webjob-publish-settings.json" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -193,6 +195,7 @@
   <Import Project="packages\Bond.CSharp.3.0.7\build\Bond.CSharp.targets" Condition="Exists('packages\Bond.CSharp.3.0.7\build\Bond.CSharp.targets')" />
   <Import Project="packages\Microsoft.Azure.Monitoring.DataPipe.Blob.IO.2.0.2\build\Microsoft.Azure.Monitoring.DataPipe.Blob.IO.targets" Condition="Exists('packages\Microsoft.Azure.Monitoring.DataPipe.Blob.IO.2.0.2\build\Microsoft.Azure.Monitoring.DataPipe.Blob.IO.targets')" />
   <Import Project="packages\MDS-DataAccessClient.31.0.0\build\MDS-DataAccessClient.targets" Condition="Exists('packages\MDS-DataAccessClient.31.0.0\build\MDS-DataAccessClient.targets')" />
+  <Import Project="packages\Microsoft.Web.WebJobs.Publish.1.0.9\tools\webjobs.targets" Condition="Exists('packages\Microsoft.Web.WebJobs.Publish.1.0.9\tools\webjobs.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

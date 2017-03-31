@@ -90,7 +90,6 @@ var Telemetry;
         TelemetryManager.CreateTotalTrafficChartData = function (quantileData) {
             var datasets = [];
             var dateLabels = quantileData.QuantileDurations.map(function (q) { return q.DateTime; });
-            var scaling = 170 / 6;
             var chartData = [];
             quantileData.QuantileDurations.forEach(function (q) {
                 chartData.push(q.Count);
@@ -196,8 +195,14 @@ var Telemetry;
         Handlers.Load = function () {
             TelemetryManagerInstance.Load();
         };
-        Handlers.ClearInput = function (domName) {
-            $(domName.data).val('');
+        Handlers.ClearActivityName = function () {
+            $("#InputActivityName").val('');
+            $("#InputActivityType").val('');
+            $("#InputActivitySubType").val('');
+        };
+        Handlers.ClearActivityType = function () {
+            $("#InputActivityType").val('');
+            $("#InputActivitySubType").val('');
         };
         return Handlers;
     }());
@@ -221,9 +226,8 @@ $(document).ready(function () {
     $('#InputActivitySubType').focus(Telemetry.Handlers.LoadActivitySubTypes);
     $('#LoadBtn').click(Telemetry.Handlers.Load);
     $('#LookBackBtn').click(Telemetry.Handlers.LookBack);
-    //$("#SearchClearActivityName").click("#InputActivityName", Telemetry.Handlers.ClearInput);
-    //$("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearInput);
-    //$("#SearchClearActivitySubType").click("#InputActivitySubType", Telemetry.Handlers.ClearInput);
+    $("#SearchClearActivityName").click(Telemetry.Handlers.ClearActivityName);
+    $("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearActivityType);
     $('.has-clear input[type="text"]').on('input propertychange', function () {
         var $this = $(this);
         var visible = Boolean($this.val());
@@ -234,4 +238,3 @@ $(document).ready(function () {
             .trigger('propertychange').focus();
     });
 });
-//# sourceMappingURL=Telemetry.js.map

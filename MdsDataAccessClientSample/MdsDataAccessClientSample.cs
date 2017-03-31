@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Security.Cryptography.X509Certificates;
 using MdsDataAccess;
 using MdsDataAccessClientSample;
 using Microsoft.Cis.Monitoring.Mds.mdscommon;
@@ -16,6 +17,11 @@ namespace MdsDataAccessClientLibSample
 
         public static void FetechDataUsingAsyncApi()
         {
+            //string certfile = System.IO.Path.Combine(Environment.ExpandEnvironmentVariable‌​s("%HOME%"), @"site\wwwroot\HttpTriggerCSharp4\myCertFile.pfx");
+            //var certFile = @"C:\MyRepo\Hackathon\MdsCertificate.pfx";
+            //var cert = new X509Certificate2(certFile, "P@ssword");
+            //var uri = new UriBuilder(MdsEndpoint);
+            //var mdsDataAccessClient = new MdsDataAccessClient(uri.Uri, cert);
             var mdsDataAccessClient = new MdsDataAccessClient(MdsEndpoint, MdsCertSubjectName);
             int retryNum = 0, counter = 0;
 

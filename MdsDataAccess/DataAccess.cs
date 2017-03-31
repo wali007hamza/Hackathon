@@ -5,6 +5,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MdsDataAccess
 {
@@ -13,17 +14,24 @@ namespace MdsDataAccess
         private readonly Lazy<ConnectionMultiplexer> _redis =
             new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect("localhost:6379"));
 
-        public void SaveData(IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>> durationQuantiles)
+        public async Task SaveData(IDictionary<DateTime, IDictionary<string, IDictionary<string, IDictionary<string, Tuple<int, int, int, int, int, int, int>>>>> durationQuantiles)
         {
             var redisDb = _redis.Value.GetDatabase();
 
             var hashList = new List<HashEntry>();
+            var hashDeletionList = new List<string>();
             foreach (var kv in durationQuantiles)
             {
-                hashList.Add(new HashEntry(kv.Key.Truncate(TimeSpan.FromMinutes(1)).Ticks, JsonConvert.SerializeObject(kv.Value)));
+                var dateTimeKey = kv.Key.Truncate(TimeSpan.FromMinutes(1));
+                hashList.Add(new HashEntry(dateTimeKey.Ticks, JsonConvert.SerializeObject(kv.Value)));
+                hashDeletionList.Add(dateTimeKey.AddDays(-2).Ticks.ToString());
             }
 
             redisDb.HashSet("urn:durationQuantiles", hashList.ToArray());
+            foreach (var entryToDelete in hashDeletionList)
+            {
+                await redisDb.HashDeleteAsync("urn:durationQuantiles", entryToDelete);
+            }
         }
 
         public dynamic GetData(DateTime dateTime)

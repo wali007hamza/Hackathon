@@ -29,7 +29,7 @@
                 <div class="col-xs-12 form-group has-clear">
                     <label for="InputActivityName" class="control-label">ActivityName</label>
                     <input class="form-control" type="text" id="InputActivityName" list="ActivityNameList" value="@ViewBag.FirstActivity.Name" />
-                    <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                    <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden" id="SearchClearActivityName"></span>
                     <datalist id="ActivityNameList">
                         @foreach (var activityName in ViewBag.ActivityNames)
                         {
@@ -40,13 +40,13 @@
                 <div class="form-group col-xs-6 has-clear">
                     <label for="InputActivityType" class="control-label">ActivityType</label>
                     <input class="form-control" type="text" id="InputActivityType" list="ActivityTypeList" value="@ViewBag.FirstActivity.Type" />
-                    <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                    <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden" id="SearchClearActivityType"></span>
                     <datalist id="ActivityTypeList"></datalist>
                 </div>
                 <div class="form-group col-xs-6 has-clear">
                     <label for="InputActivitySubType" class="control-label">ActivitySubType</label>
                     <input class="form-control" type="text" id="InputActivitySubType" list="ActivitySubTypeList" value="@ViewBag.FirstActivity.SubType" />
-                    <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                    <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden" id="SearchClearActivitySubType"></span>
                     <datalist id="ActivitySubTypeList"></datalist>
                 </div>
                 <div class="form-group col-xs-6 has-clear">

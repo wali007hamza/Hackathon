@@ -163,7 +163,6 @@ module Telemetry {
         private static CreateTotalTrafficChartData(quantileData: IQuantileData): LinearChartData {
             var datasets: ChartDataSet[] = [];
             var dateLabels: string[] = quantileData.QuantileDurations.map(q => q.DateTime);
-            var scaling: number = 170 / 6;
             var chartData: number[] = [];
             quantileData.QuantileDurations.forEach((q) => {
                 chartData.push(q.Count);
@@ -297,8 +296,15 @@ module Telemetry {
             TelemetryManagerInstance.Load();
         }
 
-        public static ClearInput(domName: any): void {
-            $(domName.data).val('');
+        public static ClearActivityName(): void {
+            $("#InputActivityName").val('');
+            $("#InputActivityType").val('');
+            $("#InputActivitySubType").val('');
+        }
+
+        public static ClearActivityType(): void {
+            $("#InputActivityType").val('');
+            $("#InputActivitySubType").val('');
         }
     }
 
@@ -323,9 +329,8 @@ $(document).ready(() => {
     $('#InputActivitySubType').focus(Telemetry.Handlers.LoadActivitySubTypes);
     $('#LoadBtn').click(Telemetry.Handlers.Load);
     $('#LookBackBtn').click(Telemetry.Handlers.LookBack);
-    //$("#SearchClearActivityName").click("#InputActivityName", Telemetry.Handlers.ClearInput);
-    //$("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearInput);
-    //$("#SearchClearActivitySubType").click("#InputActivitySubType", Telemetry.Handlers.ClearInput);
+    $("#SearchClearActivityName").click(Telemetry.Handlers.ClearActivityName);
+    $("#SearchClearActivityType").click("#InputActivityType", Telemetry.Handlers.ClearActivityType);
 
     $('.has-clear input[type="text"]').on('input propertychange', function () {
         var $this = $(this);
