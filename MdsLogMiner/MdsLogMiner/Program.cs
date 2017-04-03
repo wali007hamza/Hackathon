@@ -27,7 +27,7 @@ namespace MdsLogMiner
             var mdsDataAccessClient = new MdsDataAccessClient(MdsEndpoint, MdsCertSubjectName);
             int retryNum = 0, counter = 0;
 
-            var startTime = DateTime.UtcNow.AddHours(-2);
+            var startTime = DateTime.UtcNow.AddHours(-12);
             while (startTime < DateTime.UtcNow)
             {
                 while (retryNum < MaxRetry)
@@ -68,7 +68,6 @@ namespace MdsLogMiner
             }
 
             SaveDatapointNames(_dataPointNames);
-            Console.ReadKey();
         }
 
         private class DataType
